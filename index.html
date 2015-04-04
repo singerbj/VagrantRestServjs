@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>VagrantRestServ</title>
+    <!--<link rel="stylesheet" type="text/css" href="css/mycss.css"> -->
+    <style>
+      .error{
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="text" id="command" placeholder="insert command here" value="ls"></input>
+    <input type="text" id="path" placeholder="insert path here" value="/"></input>
+    <button id="command-button">Run</button>
+    <button id="clear-button">Clear</button>
+    <p id="result" style="font-family: monospace !important;"></p>
+    <script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+    <!--<script type="text/javascript" src="js/myjs.js"></script>-->
+    <script>
+      window.onload = function(){
+          var command = $('#command');
+          var path = $('#path');
+          var commandButton = $('#command-button');
+          var clearButton= $('#clear-button');
+          var p = $('#result');
+          
+          commandButton.click(function(){
+            window.ws.send(JSON.stringify({ command: command.val(), path: path.val()}));  
+          });
+          
+          clearButton.click(function(){
+            p.empty();
+          });  
+
+          function start(websocketServerLocation){
+            if(window.ws){
+              window.ws.close();
+              delete window.ws;
+            }
+            window.ws = new WebSocket(websocketServerLocation);
+            window.ws.onopen = function(){
+              if(window.timerID){ 
+                window.clearInterval(window.timerID);
+                window.timerID = 0;
+              }
+              p.append('websocket opened<br>'); 
+            };
+            window.ws.onclose = function(){ 
+              p.append('<br><br><span class="error">websocket closed</span><br>');
+              if(!window.timerID){ 
+                window.timerID = setInterval(function(){start(websocketServerLocation)}, 2000);
+              }
+            }
+            window.ws.onmessage = function(m){
+              p.append(m.data);
+            };
+            
+            
+          };
+          start('ws://' + window.location.hostname + ":8081");
+        }
+      </script>
+    </body>
+  </html>
