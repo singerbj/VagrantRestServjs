@@ -3,55 +3,6 @@
   <head>
     <title>VagrantRestServ</title>
     <!--link rel="stylesheet" type="text/css" href="base.css"></link-->
-    <style>
-      .error{
-        color: red;
-      }
-
-      body {
-          background-color: #F0F0F0;        
-      }
-
-      html,h1,h2,h3,h4,h5 {
-          font-family: Arial, Helvetica, sans-serif;
-          color: #2C2C2C;
-      }
-
-      button, input[type="button"], input[type="reset"], input[type="submit"] {
-          min-width: 10em;
-          min-height: 3em;
-          border: none;
-          border-radius: 0.2em;
-          background: #0099FF;
-          color: white;
-          font-size: 1em;
-          margin: 1em;
-      }
-
-      input, select {    
-          border: 1px solid #000;
-          padding: 1em;
-          border-radius: 0px;   
-          font-size: 1em;
-          margin: 1em;   
-      }
-      textarea {    
-          border: 1px solid #000;
-          padding: 1em;
-          border-radius: 0px;   
-          font-size: 1em;
-          margin: 1em;   
-          font-family: Arial, Helvetica, sans-serif;
-      }
-
-      input:focus,
-      select:focus,
-      textarea:focus,
-      button:focus {
-          outline: none;
-      }
- 
-    </style>
   </head>
   <body>
     <input type="text" id="command" placeholder="insert command here" value="ls"></input>
@@ -68,14 +19,14 @@
           var commandButton = $('#command-button');
           var clearButton= $('#clear-button');
           var p = $('#result');
-          
+
           commandButton.click(function(){
-            window.ws.send(JSON.stringify({ command: command.val(), path: path.val()}));  
+            window.ws.send(JSON.stringify({ command: command.val(), path: path.val()}));
           });
-          
+
           clearButton.click(function(){
             p.empty();
-          });  
+          });
 
           function start(websocketServerLocation){
             if(window.ws){
@@ -84,23 +35,23 @@
             }
             window.ws = new WebSocket(websocketServerLocation);
             window.ws.onopen = function(){
-              if(window.timerID){ 
+              if(window.timerID){
                 window.clearInterval(window.timerID);
                 window.timerID = 0;
               }
-              p.append('websocket opened<br>'); 
+              p.append('websocket opened<br>');
             };
-            window.ws.onclose = function(){ 
+            window.ws.onclose = function(){
               p.append('<br><br><span class="error">websocket closed</span><br>');
-              if(!window.timerID){ 
+              if(!window.timerID){
                 window.timerID = setInterval(function(){start(websocketServerLocation)}, 2000);
               }
             }
             window.ws.onmessage = function(m){
               p.append(m.data);
             };
-            
-            
+
+
           };
           start('ws://' + window.location.hostname + ":8081");
         }

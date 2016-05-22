@@ -1,0 +1,27 @@
+{
+  "name": "vagrant-rest-serv-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "runner.js",
+  "dependencies": {
+    "file": "^0.2.2",
+    "node-simple-router": "^0.10.0",
+    "untildify": "^3.0.2",
+    "ws": "^0.7.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/singerbj/VagrantRestServjs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/singerbj/VagrantRestServjs/issues"
+  },
+  "homepage": "https://github.com/singerbj/VagrantRestServjs#readme"
+}
