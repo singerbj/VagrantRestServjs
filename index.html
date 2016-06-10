@@ -2,30 +2,72 @@
 <html>
   <head>
     <title>VagrantRestServ</title>
-    <!--link rel="stylesheet" type="text/css" href="base.css"></link-->
+    <!-- <link rel="stylesheet" type="text/css" href="base.css"></link> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <style>
+        #commandContainer {
+            position: absolute;
+            top: calc(100% - 30px);
+            left: 0px;
+            width: 100%;
+            height: 30px;
+        }
+        #command{
+            position: absolute;
+            left: 3px;
+            width: calc(100% - 6px);
+            height: calc(100% - 6px);
+        }
+        #outputContainer{
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            height: calc(100% - 30px);
+            overflow: scroll;
+            font-size: 12px;
+        }
+    </style>
   </head>
   <body>
-    <input type="text" id="command" placeholder="insert command here" value="ls"></input>
-    <input type="text" id="path" placeholder="insert path here" value="/"></input>
-    <button id="command-button">Run</button>
-    <button id="clear-button">Clear</button>
-    <p id="result" style="font-family: monospace !important;"></p>
+    <!-- <input type="text" id="path" placeholder="insert path here" value="/"></input> -->
+    <!-- <button id="command-button">Run</button> -->
+    <!-- <button id="clear-button">Clear</button> -->
+    <div id="outputContainer" style="font-family: monospace !important;">
+    </div>
+    <div id="commandContainer">
+        <input class="form-control" type="text" id="command" placeholder="type command here"></input>
+    </div>
     <script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.min.js"></script>
     <!--<script type="text/javascript" src="js/myjs.js"></script>-->
     <script>
       window.onload = function(){
+          var outputContainer = $('#outputContainer');
           var command = $('#command');
           var path = $('#path');
           var commandButton = $('#command-button');
           var clearButton= $('#clear-button');
           var p = $('#result');
 
-          commandButton.click(function(){
-            window.ws.send(JSON.stringify({ command: command.val(), path: path.val()}));
-          });
+          command.focus();
+          $(document).click(function(){
+              command.focus();
+          })
 
-          clearButton.click(function(){
-            p.empty();
+          $(document).keypress(function(event){
+              var keycode = (event.keyCode ? event.keyCode : event.which);
+              console.log(keycode);
+              if(keycode === 13){
+                  window.ws.send(JSON.stringify({ command: command.val(), path: path.val()}));
+                  command.val('');
+                  command.focus();
+              }
+              if(keycode === 12){
+                  outputContainer.empty();
+                  command.val('');
+                  command.focus();
+              }
           });
 
           function start(websocketServerLocation){
@@ -39,18 +81,20 @@
                 window.clearInterval(window.timerID);
                 window.timerID = 0;
               }
-              p.append('websocket opened<br>');
+              outputContainer.append('Connected<br>');
+              outputContainer.animate({ scrollTop: outputContainer.prop("scrollHeight")}, 500);
             };
             window.ws.onclose = function(){
-              p.append('<br><br><span class="error">websocket closed</span><br>');
+              outputContainer.append('<br><br><span class="error">Disconnected</span><br>');
+              outputContainer.animate({ scrollTop: outputContainer.prop("scrollHeight")}, 500);
               if(!window.timerID){
                 window.timerID = setInterval(function(){start(websocketServerLocation)}, 2000);
               }
             }
             window.ws.onmessage = function(m){
-              p.append(m.data);
+              outputContainer.append(m.data);
+              outputContainer.animate({ scrollTop: outputContainer.prop("scrollHeight")}, 500);
             };
-
 
           };
           start('ws://' + window.location.hostname + ":8081");
